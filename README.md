@@ -1,51 +1,55 @@
 # JobHunter AI
 
-**An autonomous agent that finds jobs and internships, tailors the resume with true facts only, applies, and asks its owner for help only when a human is needed.**
+**An autonomous agent that finds jobs, internships, hackathons and tech events, builds a true resume for each one, applies, and asks its owner for help only when a human is needed.**
 
 **Live site: [jobhunter-ai-mauve.vercel.app](https://jobhunter-ai-mauve.vercel.app)** (a private, single-owner app: the sign-in page is public, the data is not)
 
-> This repository is a project showcase. The source code is private and is not published here.
+> This repository is a project showcase. The source code is private and is not published here. The video uses sample data only.
 
 [![JobHunter AI walkthrough](demo-preview.gif)](demo.mp4)
 
-[Watch the full walkthrough (demo.mp4)](demo.mp4)
+[Watch the full walkthrough (demo.mp4, 52 seconds)](demo.mp4)
 
 ## What it does
 
-- **Discover.** Pulls fresh postings from Greenhouse, Lever, RemoteOK and LinkedIn on a schedule, keeps only roles in the owner's field that are open to India-based juniors, and scores each one against the owner's profile. A score threshold routes it to auto-apply, watch or reject.
-- **Tailor.** Builds a one-page LaTeX resume and a cover letter per job from a single master resume. It reorders skills and projects and rewrites the summary for the role. A no-fabrication rule means it never adds a skill, project or date the owner does not have, and a quality gate flags weak tailoring.
-- **Apply.** Fills and submits company career-page forms with Playwright. Where a posting names an email address, it sends the application from the owner's Gmail instead. A job is marked as sent only when a confirmation is seen or an email really went out.
-- **Ask for help.** If a CAPTCHA, a new question or an agreement needs a person, it pauses, emails and pushes to the owner's phone with a link, and resumes after the answer. It does not try to bypass CAPTCHAs. Answers are saved and reused.
-- **Follow up.** Reads the inbox (read-only) for replies, tracks approvals and declines, adds interviews to the owner's iPhone calendar, and emails interview prep.
+- **Discover.** Pulls fresh postings from Greenhouse, Lever, RemoteOK and LinkedIn every hour, keeps only roles in the owner's field that are open to India-based juniors, skips unpaid roles, off-stack roles and scam patterns, and scores each posting against the owner's profile.
+- **Tailor.** Builds a one-page LaTeX resume and a cover letter per job from a single master resume. A no-fabrication rule means it never adds a skill, project or date the owner does not have. A final check compares every resume with the master: one page, readable by applicant-tracking systems, real facts only.
+- **ATS score on every application.** Each generated resume gets an ATS score out of 100. It is saved with the application and shown in the app (Sent, Needs you, Overview) and in the email the owner receives for every application.
+- **Apply.** Sends the resume by email from the owner's own Gmail when a posting names an address, or fills the company form with a browser. Dropdowns and standard questions (country, sponsorship, previous employment) are answered truthfully, and roles that need another country's work permit are skipped. An application counts as sent only when a confirmation is seen or an email really went out.
+- **Ask for help.** If a CAPTCHA or a new question appears, it pauses and sends a phone alert and an email with a link. It never bypasses a CAPTCHA. Answers are saved and reused.
+- **Hackathons and tech events in Hyderabad.** Finds in-person and hybrid events from Devfolio, Unstop, Meetup, Luma and Eventbrite, alerts the owner, adds events to a calendar feed, and registers automatically where a plain Google Form allows it. Pages that need a login or show a CAPTCHA are handed to the owner with the reason.
+- **Fill extension and Apply kit.** A Chrome extension fills any application form and attaches the right resume on a laptop. On a phone, a kit page offers the resume download and one-tap copy for every answer.
+- **Follow up.** Reads the inbox (read-only) for replies, tracks approvals and declines, adds interviews to the owner's iPhone calendar, and emails interview prep. A built-in bank of 55 internship questions comes with full answers that use only the owner's real facts.
+- **Safeguards.** If Gmail rejects the login, the agent says so on the dashboard and on the phone and pauses email steps. A watchdog alerts if a scheduled run goes missing.
 - **Runs on free tiers.** Scheduled runs use GitHub Actions, the database is Neon Postgres, the API is on Render and the site is on Vercel. No server stays on at home.
 
 ## How it fits together
 
 ```
-Sources (Greenhouse, Lever, RemoteOK, LinkedIn)
+Sources (Greenhouse, Lever, RemoteOK, LinkedIn) + Hyderabad events
         |
-   Domain + eligibility filter  ->  match score  ->  auto-apply / watch / reject
+   Filters: field, India, seniority, unpaid, scams  ->  match score  ->  auto-apply / watch / reject
         |
-   Resume + cover letter tailoring (LaTeX, one page, no-fabrication rule, quality gate)
+   Resume + cover letter (LaTeX, one page, master-resume check, ATS score)
         |
-   Playwright form submit  or  apply-by-email
-        |                          |
-   confirmation seen?        needs a person? -> email + phone push -> resume
+   Email apply  or  company form (Playwright)  or  event registration (Google Forms)
+        |                         |
+   proof of sending       needs a person? -> phone alert + email -> Apply kit / Fill extension
         |
-   Inbox check -> interview invite -> calendar + prep notes
+   Inbox check -> interview invite -> calendar + prep with answers
 ```
 
 ## Built with
 
-Python and FastAPI, SQLAlchemy (async) with Postgres, Playwright, LaTeX, Next.js and React with Tailwind, GitHub Actions for scheduling, Neon, Render and Vercel for hosting, ntfy for phone push. The backend has 450+ automated tests.
+Python and FastAPI, SQLAlchemy (async) with Postgres, Playwright, LaTeX, Next.js and React with Tailwind, a Chrome extension, GitHub Actions for scheduling, Neon, Render and Vercel for hosting, ntfy for phone push. The backend has 490+ automated tests.
 
 ## What I worked on
 
-I designed and built the whole system: discovery and filtering, the resume tailoring engine and its safety rules, the form-filling and email-apply flows, the human-in-the-loop handoff, inbox tracking, the interview-prep and calendar features, the web app, and the free-tier hosting setup.
+I designed and built the whole system: discovery and filtering, the resume engine and its safety rules, the form-filling, email and event-registration flows, the human-in-the-loop handoff, inbox tracking, interview prep, the browser extension, the web app and its design, and the free-tier hosting setup.
 
 ## Status
 
-A working personal tool, used by its owner only. It is not a service for others and is not affiliated with any employer or job board.
+A working personal tool, used by its owner only. It is not a service for others and is not affiliated with any employer, event organiser or job board.
 
 ## Contact
 
